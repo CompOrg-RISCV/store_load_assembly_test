@@ -15,47 +15,47 @@
 _start:
 	.global _start
 
-	addi x2, x0, 0x87			// Create test value of 0x87654321 corresponding to their byte number
+	addi x2, x0, 0x87			        // Create test value of 0x87654321 corresponding to their byte number
 	slli x2, x2, 8
 	addi x2, x2, 0x65
 	slli x2, x2, 8
 	addi x2, x2, 0x43
 	slli x2, x2, 8
-	addi x2, x2, 0x21			// x2 will have the value 0x87654321 when completed
+	addi x2, x2, 0x21			        // x2 will have the value 0x87654321 when completed
 	nop
 	nop
 	nop
 	nop
-	nop							// create base address for store operations in x3
-	addi x3, x0, 0x20
-	slli x3, x3, 8				// base address will be x3 = 0x2000
+	nop		                // x2 = 0x87654321					        
+	addi x3, x0, 0x20                   // create base address for store operations in x3 = 0x2000
+	slli x3, x3, 8				        
 	nop
 	nop
 	nop
 	nop
-	nop
-	sw	x2, 0(x3)				// word store of x2, 0x87654321, into memory address 0x2000
-	sb	x2, 7(x3)				// store byte value 0x21 to 0x2007
-	srli x4, x2, 8				// 0x43 shifted to the byte location to be stored
-	sb  x4, 6(x3)				// store byte value 0x43 to 0x2006 //also test out data hazard/forwarding from EX stage
+	nop                     // base address will be x3 = 0x2000
+	sw	x2, 0(x3)				        // word store of x2, 0x87654321, into memory address 0x2000
+	sb	x2, 7(x3)				        // store byte value 0x21 to 0x2007
+	srli x4, x2, 8				        // 0x43 shifted to the byte location to be stored
+	sb  x4, 6(x3)				        // store byte value 0x43 to 0x2006 //also test out data hazard/forwarding from EX stage
 	nop					// memory location at 0x2000 will now equal 0x87654321
-	srli x4, x4, 8		// 0x65 shifted to the byte location to be stored //address 0x2004 = 0x21000000
+	srli x4, x4, 8		// memory location 0x2004 = 0x21000000 (little endian word aligned = 0x00000021)  // 0x65 shifted to the byte location to be stored 
 	nop
-	sb  x4, 5(x3)		// store byte value 0x65 to 0x2005 //also test out data hazard/forwarding from MEM stage (address 0x2004 = 0x2143
-	srli x4, x4, 8				// 0x87 shifted to the byte location to be stored
-	sb  x4, 4(x3)				// store byte value 0x87 to 0x2004
+	sb  x4, 5(x3)		// memory location 0x2004 = 0x21430000 (little endian word aligned = 0x00004321)  //also test out data hazard/forwarding from MEM stage 
+	srli x4, x4, 8				        // 0x87 shifted to the byte location to be stored
+	sb  x4, 4(x3)				        // store byte value 0x87 to 0x2004
 	nop
-	nop					// memory location at 0x2004 now 0x21436500
+	nop					// memory location 0x2004 =  0x21436500 (little endian word aligned = 0x00654321)
 	nop
-	sh  x2, 10(x3)		// store 0x4321 to location 0x2010 // memory location at 0x2004 now 0x21436587
-	srli x10, x2, 16				// shift 0x8765 to half-word store location, lower 16-bits
-	sh  x10, 8(x3)				// store 0x8765 to location 0x2008
+	sh  x2, 10(x3)		// memory location 0x2004 = 0x21436587 (little endian word aligned = 0x87654321) // store halfword 0x4321 to location 0x2010 
+	srli x10, x2, 16				    // shift 0x8765 to half-word store location, lower 16-bits
+	sh  x10, 8(x3)				        // store 0x8765 to location 0x2008
 	nop
-	nop					// momory location at 0x2008 now 0x4321000
+	nop					// memory location at 0x2008 now 0x21430000 (little endian word aligned = 0x00004321)
 	nop
-	nop					// memory location at 0x2008 now 0x43218765
+	nop					// memory location at 0x2008 now 0x21436587 (little endian word aligned = 0x87654321)
 	nop
-	beq x0, x0, TEST	// Branch to validate that the branch cancels the write to 0x200c
+	beq x0, x0, TEST	                // Branch to validate that the branch cancels the write to 0x200c
 	sw x2, 12(x3)
 	nop
 	nop
@@ -76,8 +76,8 @@ TEST:
 	nop
 	nop
 	nop
-	lw x4, 0(x3)			// load the value from memory which was written from x2.  x3 will equal x2
-	lb x5, 7(x3)			// reassemble x2 from the bytes write at 0x2004. x4 will equal x2
+	lw x4, 0(x3)			            // load the value from memory which was written from x2.  x4 will equal x2
+	lb x5, 7(x3)			            // reassemble x2 from the bytes written at 0x2004. x5 will equal x2
 	nop
 	nop
 	lb x10, 6(x3)
@@ -93,12 +93,12 @@ TEST:
 	slli x10, x10, 24
 	or x5, x5, x10
 	nop
-	lh x10, 8(x3)
+	lh x10, 8(x3)       // check that x5 == x2 (confirms byte loads)
 	nop
 	slli x10, x10, 16
-	or x6, x6, x10		// check that x5 == x2 (confirms byte loads)
+	or x6, x6, x10		
 	nop
-	addi x10, x0, 0xff		// store byte of 0xff or -1
+	addi x10, x0, 0xff		            // store byte of 0xff or -1
 	nop
 	sb x10, 12(x3)
 	nop					// check that x6 == x2 (confirms half-word loads)
@@ -131,24 +131,24 @@ TEST:
 /**************************************************************************
  * Extra-credit Load test to validate structural hazard detected and stall
  **************************************************************************/
- 	addi x9, x0, 0			// initializing test register x9 to 0
+ 	addi x9, x0, 0			            // initializing test register x9 to 0
  	nop
 	nop
 	nop
 	nop
 	nop
-	lw x8, 16(x3)			// loading value of 0x87654321 int x8 registers
-	addi x9, x8, 0			// Moving value from x8 which should be read from memory as x87654321
+	lw x8, 16(x3)			             / loading value of 0x87654321 int x8 registers
+	addi x9, x8, 0			            // Moving value from x8 which should be read from memory as x87654321
 	addi x10, x9, 0
 	nop
-	nop					// x8 should now equal x87654321
-	nop
+	nop					
+	nop                 // x8 should now equal x87654321
 	nop					// x9 == x8 if load structural hazard detected and IF, ID stall with IDEX clear (NOP bubble)
 	nop					// x10 = x9
 	jal x1, JUMP			// generate case of control hazard, clear pipeline regs IDEX & EXMEM and change address in IF stage w/simulataneous load structural hazard
 JUMP:
-	lw x11, 16(x3)			// setting x11 to 0x87654321
-	sw x11, 20(x3)			// checking for structural hazard for store after load
+	lw x11, 16(x3)			            // setting x11 to 0x87654321
+	sw x11, 20(x3)			            // checking for structural hazard for store after load
 	lw x12, 20(x3)
 	nop
 	nop
