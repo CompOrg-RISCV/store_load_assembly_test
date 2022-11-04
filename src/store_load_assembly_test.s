@@ -16,7 +16,7 @@ _start:
 	.global _start
 
 	addi x2, x0, 0x87			        // Create test value of 0x87654321 corresponding to their byte number
-	slli x2, x2, 8
+	slli x2, x2, 8                      
 	addi x2, x2, 0x65
 	slli x2, x2, 8
 	addi x2, x2, 0x43
@@ -39,21 +39,21 @@ _start:
 	srli x4, x2, 8				        // 0x43 shifted to the byte location to be stored
 	sb  x4, 6(x3)				        // store byte value 0x43 to 0x2006 //also test out data hazard/forwarding from EX stage
 	nop					// memory location at 0x2000 will now equal 0x87654321
-	srli x4, x4, 8		// memory location 0x2004 = 0x21000000 (little endian word aligned = 0x00000021)  // 0x65 shifted to the byte location to be stored 
+	srli x4, x4, 8		// memory location 0x2004 = little endian word aligned of 0x21000000  // 0x65 shifted to the byte location to be stored 
 	nop
-	sb  x4, 5(x3)		// memory location 0x2004 = 0x21430000 (little endian word aligned = 0x00004321)  //also test out data hazard/forwarding from MEM stage 
+	sb  x4, 5(x3)		// memory location 0x2004 = little endian word aligned of 0x21430000  //also test out data hazard/forwarding from MEM stage 
 	srli x4, x4, 8				        // 0x87 shifted to the byte location to be stored
 	sb  x4, 4(x3)				        // store byte value 0x87 to 0x2004
 	nop
-	nop					// memory location 0x2004 =  0x21436500 (little endian word aligned = 0x00654321)
+	nop					// memory location 0x2004 = little endian word aligned of 0x21436500
 	nop
-	sh  x2, 10(x3)		// memory location 0x2004 = 0x21436587 (little endian word aligned = 0x87654321) // store halfword 0x4321 to location 0x2010 
+	sh  x2, 10(x3)		// memory location 0x2004 = little endian word aligned of 0x21436587 // store halfword 0x4321 to location 0x2010 
 	srli x10, x2, 16				    // shift 0x8765 to half-word store location, lower 16-bits
 	sh  x10, 8(x3)				        // store 0x8765 to location 0x2008
 	nop
-	nop					// memory location at 0x2008 now 0x21430000 (little endian word aligned = 0x00004321)
+	nop					// memory location 0x2008 = little endian word aligned of 0x43210000
 	nop
-	nop					// memory location at 0x2008 now 0x21436587 (little endian word aligned = 0x87654321)
+	nop					// memory location 0x2008 = little endian word aligned of 0x43218765
 	nop
 	beq x0, x0, TEST	                // Branch to validate that the branch cancels the write to 0x200c
 	sw x2, 12(x3)
