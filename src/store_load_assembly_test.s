@@ -93,10 +93,10 @@ TEST:
 	slli x10, x10, 24
 	or x5, x5, x10
 	nop
-	lh x10, 8(x3)       // check that x5 == x2 (confirms byte loads)
+	lh x10, 8(x3)       
 	nop
 	slli x10, x10, 16
-	or x6, x6, x10		
+	or x6, x6, x10		// check that x5 == x2 (confirms byte loads)
 	nop
 	addi x10, x0, 0xff		            // store byte of 0xff or -1
 	nop
