@@ -137,7 +137,7 @@ TEST:
 	nop
 	nop
 	nop
-	lw x8, 16(x3)			             / loading value of 0x87654321 int x8 registers
+	lw x8, 16(x3)			            // loading value of 0x87654321 int x8 registers
 	addi x9, x8, 0			            // Moving value from x8 which should be read from memory as x87654321
 	addi x10, x9, 0
 	nop
