@@ -105,10 +105,15 @@ TEST:
 	lb x7, 12(x3)
 	lbu x8, 12(x3)
 	nop
+    sw x7, 12(x3)
 	nop
-	nop
-	nop					// lb sign extends a byte load. does x7 = 0xffffffff?
+	lh x9, 12(x3)
+    lhu x10, 12 (x3)   // lb sign extends a byte load. does x7 = 0xffffffff?
 	nop					// lbu does not sign extend byte load.  does x8 = 0xff?
+    nop
+    nop
+    nop                 // lh sign extended a half-word load.  does x9 = 0xffffffff?
+    nop                 // lhu does not sign extend half-word load. does x10 = 0x0000ffff?
 	nop
 	nop
 	nop
