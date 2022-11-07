@@ -142,19 +142,19 @@ TEST:
 	nop
 	nop
 	nop
-	lw x8, 16(x3)			            // loading value of 0x87654321 int x8 registers
+	lw x8, 0(x3)			            // loading value of 0x87654321 int x8 registers
 	addi x9, x8, 0			            // Moving value from x8 which should be read from memory as x87654321
 	addi x10, x9, 0
 	nop
 	nop					
 	nop                 // x8 should now equal x87654321
 	nop					// x9 == x8 if load structural hazard detected and IF, ID stall with IDEX clear (NOP bubble)
-	nop					// x10 = x9
+	nop					// x10 = x955
 	jal x1, JUMP			// generate case of control hazard, clear pipeline regs IDEX & EXMEM and change address in IF stage w/simulataneous load structural hazard
 JUMP:
-	lw x11, 16(x3)			            // setting x11 to 0x87654321
-	sw x11, 20(x3)			            // checking for structural hazard for store after load
-	lw x12, 20(x3)
+	lw x11, 0(x3)			            // setting x11 to 0x87654321
+	sw x11, 0x10(x3)			        // checking for structural hazard for store after load, storing into address 0x2010
+	lw x12, 0x10(x3)                    // evaluating that the store occured correctly by loading the value from 0x2010
 	nop
 	nop
 	nop					// x11 = 0x87654321
