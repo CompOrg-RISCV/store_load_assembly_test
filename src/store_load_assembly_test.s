@@ -29,14 +29,14 @@ _start:
 	nop		                // x2 = 0x87654321					        
 	addi x3, x0, 0x20                   // create base address for store operations in x3 = 0x2000
 	slli x3, x3, 8				        
+	addi x4, x3, 0x10
 	nop
 	nop
-	nop
-	nop
+	sw x2, -4(x4)                       // test negative store immediates (sign-extended immmediate)
 	nop                     // base address will be x3 = 0x2000
 	sw	x2, 0(x3)				        // word store of x2, 0x87654321, into memory address 0x2000
 	sb	x2, 7(x3)				        // store byte value 0x21 to 0x2007
-	srli x4, x2, 8				        // 0x43 shifted to the byte location to be stored
+	srli x4, x2, 8		// memory location 0x200c = little endian word aligned of 0x87654321, (neg. immediate)  // 0x43 shifted to the byte location to be stored
 	sb  x4, 6(x3)				        // store byte value 0x43 to 0x2006 //also test out data hazard/forwarding from EX stage
 	nop					// memory location at 0x2000 will now equal 0x87654321
 	srli x4, x4, 8		// memory location 0x2004 = little endian word aligned of 0x21000000  // 0x65 shifted to the byte location to be stored 
@@ -56,7 +56,7 @@ _start:
 	nop					// memory location 0x2008 = little endian word aligned of 0x43218765
 	nop
 	beq x0, x0, TEST	                // Branch to validate that the branch cancels the write to 0x200c
-	sw x2, 12(x3)
+	sw x3, 12(x3)
 	nop
 	nop
 TEST:
@@ -64,7 +64,7 @@ TEST:
 	nop
 	nop
 	nop
-	nop					// if memory location changes from 0 to 0x87654321. ERROR.
+	nop					// if memory location 0x200c changes from 0x87654321 to 0x2000. ERROR.
 	nop					// The branch should have canceled the store operation that occure immediate after a branch taken
 	nop
 	halt
@@ -123,8 +123,8 @@ TEST:
  **************************************************************************/
 	nop
 	nop
-	sw x2, 16(x3)
-	lw x7, 16(x3)
+	sw x2, 12(x3)
+	lw x7, 12(x3)
 	nop
 	nop
 	nop
