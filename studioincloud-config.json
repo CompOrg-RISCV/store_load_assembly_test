@@ -1,0 +1,33 @@
+{
+  "sdkPath": "/home/project/demo_project/work/ia/sdk",
+  "iaOrCa": "ia",
+  "compileConfigOptions": {
+    "compilerOptimization": "0",
+    "debugLevel": "3",
+    "noStdLib": true,
+    "nostartfiles": false,
+    "nodefaultlibs": false,
+    "nosymbolinfo": false,
+    "nosharedlibraries": false,
+    "extraFlags": "",
+    "extraLinkerFlags": "",
+    "includePaths": false,
+    "flags": [],
+    "libraries": [],
+    "assemblyFlags": []
+  },
+  "debugConfigOptions": {
+    "stopAtStartup": true,
+    "showDevDebugOutput": false,
+    "debuggerRadio": {
+      "1": false,
+      "2": true,
+      "3": false
+    },
+    "debuggerInput": {
+      "1": "",
+      "2": "0",
+      "3": ""
+    }
+  }
+}
